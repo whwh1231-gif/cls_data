@@ -1,0 +1,48 @@
+# 깃허브의 맥 서버가 대신 빌드해 주는 설정입니다. (윈도우만 있어도 아이폰 앱 파일을 얻는 방법)
+# main 브랜치에 올릴 때마다 자동 실행되고, Actions 탭에서 수동 실행(Run workflow)도 됩니다.
+name: Build iOS app
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build (서명 없이)
+        run: |
+          set -o pipefail
+          xcodebuild -project Tadak.xcodeproj -scheme Tadak -configuration Release \
+            -sdk iphoneos -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build 2>&1 | tee build.log | grep -E "error:|warning: |BUILD (SUCCEEDED|FAILED)" || true
+          test -d build/Build/Products/Release-iphoneos/Tadak.app
+
+      - name: Package IPA
+        run: |
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/Tadak.app Payload/
+          zip -qry Tadak-unsigned.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tadak-unsigned-ipa
+          path: Tadak-unsigned.ipa
+
+      - name: Upload build log (실패했을 때 원인 확인용)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log

@@ -1,0 +1,69 @@
+# XcodeGen 설정 파일 - 이 파일 하나로 Xcode 프로젝트(Tadak.xcodeproj)가 자동 생성됩니다.
+# 번들 ID(com.woo.tadak)를 바꾸려면 아래 네 곳(번들 ID 2, 그룹 2) + Shared/Prefs.swift 의 groupID 를 함께 바꾸세요.
+name: Tadak
+options:
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1"
+    DEVELOPMENT_TEAM: ""
+targets:
+  Tadak:
+    type: application
+    platform: iOS
+    sources: [App, Shared]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.woo.tadak
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    info:
+      path: Config/App-Info.plist
+      properties:
+        CFBundleDisplayName: 타닥
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        ITSAppUsesNonExemptEncryption: false
+        NSMicrophoneUsageDescription: 키보드 소리로 쓸 내 목소리를 녹음합니다.
+    entitlements:
+      path: Config/App.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.woo.tadak]
+    dependencies:
+      - target: TadakKeyboard
+  TadakKeyboard:
+    type: app-extension
+    platform: iOS
+    sources: [Keyboard, Shared]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.woo.tadak.keyboard
+    info:
+      path: Config/Keyboard-Info.plist
+      properties:
+        CFBundleDisplayName: 타닥
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.keyboard-service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).KeyboardViewController
+          NSExtensionAttributes:
+            IsASCIICapable: false
+            PrefersRightToLeft: false
+            PrimaryLanguage: ko-KR
+            RequestsOpenAccess: true
+    entitlements:
+      path: Config/Keyboard.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.woo.tadak]
+schemes:
+  Tadak:
+    build:
+      targets:
+        Tadak: all

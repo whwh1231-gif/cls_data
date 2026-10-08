@@ -1,0 +1,8 @@
+.DS_Store
+build/
+Payload/
+*.ipa
+*.xcodeproj
+Config/*.plist
+Config/*.entitlements
+xcuserdata/
