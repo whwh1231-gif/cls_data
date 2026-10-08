@@ -1,9 +1,9 @@
 # 깃허브의 맥 서버가 대신 빌드해 주는 설정입니다. (윈도우만 있어도 아이폰 앱 파일을 얻는 방법)
-# main 브랜치에 올릴 때마다 자동 실행되고, Actions 탭에서 수동 실행(Run workflow)도 됩니다.
+# tadak 브랜치에 올릴 때마다 자동 실행됩니다.
 name: Build iOS app
 on:
   push:
-    branches: [main]
+    branches: [tadak]
   workflow_dispatch:
 
 jobs:
