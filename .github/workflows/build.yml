@@ -6,6 +6,9 @@ on:
     branches: [tadak]
   workflow_dispatch:
 
+permissions:
+  contents: write   # 완성된 IPA를 Releases 에 올리기 위해 필요
+
 jobs:
   build:
     runs-on: macos-latest
@@ -39,6 +42,17 @@ jobs:
         with:
           name: Tadak-unsigned-ipa
           path: Tadak-unsigned.ipa
+
+      # Releases 에 올려 두면 로그인 없이 한 번에 받을 수 있는 고정 주소가 생긴다
+      - name: Publish IPA to Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp Tadak-unsigned.ipa Tadak.ipa
+          gh release delete tadak-latest --cleanup-tag --yes 2>/dev/null || true
+          gh release create tadak-latest Tadak.ipa --target "$GITHUB_SHA" \
+            --title "타닥 키보드 (빌드 #${{ github.run_number }})" \
+            --notes "서명 안 된 IPA 입니다. Sideloadly 로 아이폰에 설치하세요."
 
       - name: Upload build log (실패했을 때 원인 확인용)
         if: failure()
